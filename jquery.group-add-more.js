@@ -1,15 +1,15 @@
 ;(function($) {
   "use strict";
 
-  var version = '1.0';
+  var version = '2.0';
   var vernums = $.fn.jquery.split('.');
 
   $.fn.group_add_more = function(options) {
     var container = $(this);
-    var data;
+    var queue = [];
     // default options
     var defaults = {
-        addMoreClass: "content-add-more",
+        addMoreClass: "field-add-more-submit",
         groupLabel: "Add More",
         groupClass: "group-add-more",
         hide: false
@@ -34,20 +34,25 @@
       });      
     }
     
+    function flush() {
+      if (queue.length > 0) {
+        var e = queue.pop();
+        $(e).trigger("mousedown");
+      }
+    }
+    
     $(groupaddmore, container).click(function() {
-      $(addmore + " input", container).trigger("mousedown");
+      $(addmore, container).each(function() {
+        queue.push($(this));
+      });
+      flush();
       return false;
+    })
+    
+    $(document).ajaxComplete(function() {
+      flush();
     })
     
     $(container).addClass(processedClass);
   }
 })(jQuery);
-
-/*
-
-$( document ).ready(function() {
-  $(".node-form .group-images").group_add_more({hide: true, groupLabel: "Group Add", groupClass: "my-group-add-more"});
-});
-
-*/
-
